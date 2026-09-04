@@ -38,6 +38,9 @@ finds and verifies *its* IDOR with zero app-specific config — see
 **Live guide** — what it does, when to use it, how to run it against the fixtures, and how to
 put it in a programme: https://rootcawsllc.github.io/proofscan/
 
+**Run it in your browser** — a hosted demo that runs the real scanner against a sandboxed
+target (or your own pasted source), no install: @@GUI_URL@@
+
 ![Terminal output of a proofscan run with Layer 2 enabled against the FlaudeCode
 fixture. The scanner coverage block lists builtin, gitleaks and a heuristic
 reasoner as having run. Finding 4 is a high-severity authorisation-ordering
