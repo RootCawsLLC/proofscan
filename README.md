@@ -35,7 +35,8 @@ app. This is proven by a second fixture that shares none of FlaudeCode's naming
 finds and verifies *its* IDOR with zero app-specific config — see
 `npm run acceptance:agnostic`.
 
-This is a command-line tool, so there is nothing deployed to link to.
+**Live guide** — what it does, when to use it, how to run it against the fixtures, and how to
+put it in a programme: https://rootcawsllc.github.io/proofscan/
 
 ![Terminal output of a proofscan run with Layer 2 enabled against the FlaudeCode
 fixture. The scanner coverage block lists builtin, gitleaks and a heuristic

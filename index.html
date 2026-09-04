@@ -1,0 +1,193 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>proofscan — a scanner that proves the finding</title>
+<meta name="description" content="A command-line application flaw scanner. A finding is verified-exploitable only when an executed check changed another user’s data. How to run it, when to use it, and how to put it in a programme.">
+<style>
+:root{
+  --bg:#FAFAF8;--panel:#FFFFFF;--panel-2:#F5F1E8;--border:#e0e0e0;
+  --ink:#1a1a1a;--ink-2:#444444;--ink-3:#666666;--accent:#6B63B5;--accent-soft:#efedf9;
+  --breach:#B4413F;--held:#2F7D53;
+}
+@media (prefers-color-scheme:dark){
+  :root{
+    --bg:#1a1a1a;--panel:#242424;--panel-2:#2d2d2d;--border:#333333;
+    --ink:#f0f0f0;--ink-2:#c0c0c0;--ink-3:#999999;--accent:#8B7FD6;--accent-soft:#2b2740;
+    --breach:#E58A88;--held:#7FC79B;
+  }
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{margin:0;padding:2.5rem 1.25rem 4rem;background:var(--bg);color:var(--ink);
+  font:15px/1.65 ui-sans-serif,-apple-system,"Segoe UI",Roboto,Helvetica,Arial,sans-serif}
+.wrap{max-width:46rem;margin:0 auto}
+h1{font-size:1.7rem;margin:0 0 .35rem;letter-spacing:-.01em}
+.thesis{color:var(--ink-2);margin:0 0 1.25rem;font-size:1.02rem}
+.thesis b{color:var(--ink)}
+nav.toc{display:flex;flex-wrap:wrap;gap:.4rem .75rem;margin:0 0 2rem;font-size:.82rem}
+nav.toc a{color:var(--accent);text-decoration:none}
+nav.toc a:hover{text-decoration:underline}
+h2{font-size:.78rem;text-transform:uppercase;letter-spacing:.09em;color:var(--ink-3);
+  margin:2.25rem 0 .75rem;font-weight:600}
+h3{font-size:1rem;margin:1.35rem 0 .4rem}
+p,li{color:var(--ink-2)}
+p{margin:0 0 .85rem}
+ul,ol{margin:.2rem 0 1rem;padding-left:1.2rem}
+li{margin:.25rem 0}
+.note{background:var(--panel-2);border-radius:8px;padding:.85rem 1.05rem;font-size:.89rem;
+  color:var(--ink-2);margin:1.25rem 0}
+.pair{display:grid;grid-template-columns:1fr 1fr;gap:.6rem;margin:0 0 1rem}
+@media (max-width:640px){.pair{grid-template-columns:1fr}}
+.box{background:var(--panel);border:1px solid var(--border);border-radius:9px;padding:.85rem 1rem}
+.box h3{margin:.1rem 0 .4rem}
+.box.use{border-left:4px solid var(--held)}
+.box.dont{border-left:4px solid var(--breach)}
+pre{background:var(--panel-2);border:1px solid var(--border);border-radius:8px;
+  padding:.85rem 1rem;overflow-x:auto;font:13px/1.5 ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;
+  color:var(--ink);margin:0 0 1rem}
+code{font:13px/1.45 ui-monospace,SFMono-Regular,Menlo,Consolas,monospace}
+table{width:100%;border-collapse:collapse;font-size:.9rem;margin:0 0 1rem}
+th,td{text-align:left;vertical-align:top;padding:.45rem .5rem .45rem 0;border-bottom:1px solid var(--border)}
+th{color:var(--ink-3);font-weight:600;font-size:.78rem;text-transform:uppercase;letter-spacing:.06em}
+figure{margin:0 0 1rem}
+figure img{width:100%;height:auto;border-radius:8px;border:1px solid var(--border);background:#1e222a}
+figcaption{color:var(--ink-3);font-size:.82rem;margin-top:.4rem}
+.card{display:block;background:var(--panel);border:1px solid var(--border);border-left:4px solid var(--accent);
+  border-radius:9px;padding:.9rem 1.1rem;margin-bottom:.6rem}
+.card .t{font-weight:600;margin-bottom:.15rem;color:var(--ink)}
+.card .d{color:var(--ink-3);font-size:.87rem}
+footer{margin-top:2.5rem;padding-top:1rem;border-top:1px solid var(--border);
+  color:var(--ink-3);font-size:.84rem}
+footer a{color:var(--accent)}
+</style>
+</head>
+<body><div class="wrap">
+
+<h1>proofscan</h1>
+<p class="thesis">A command-line application flaw scanner. A finding is
+<b><code>verified-exploitable</code> only once a generated check changed another user’s data</b>,
+and flips to <code>fixed-verified</code> only when that check no longer reproduces. There is nothing
+to deploy — this page is the walkthrough you can follow on a laptop, against fixtures, in an afternoon.</p>
+
+<nav class="toc" aria-label="On this page">
+  <a href="#what">What it does</a>
+  <a href="#when">When to use it</a>
+  <a href="#how">How to use it</a>
+  <a href="#org">Take it into your org</a>
+  <a href="#output">What a run looks like</a>
+  <a href="#limits">Honest limits</a>
+</nav>
+
+<h2 id="what">What it does</h2>
+<p>Most scanners hand you a pile of “maybe.” proofscan only promotes a finding when it has watched the other user’s data change. That is the whole product.</p>
+<p>Four layers, cheapest first:</p>
+<table>
+  <thead><tr><th>Layer</th><th>What you get</th></tr></thead>
+  <tbody>
+    <tr><td>1 · Static</td><td>Built-in AST rules, plus Semgrep / Gitleaks / Trivy when they are on <code>PATH</code>. Fast, no network. Coverage is printed <i>before</i> findings, so “scanner not installed” cannot look like “clean.”</td></tr>
+    <tr><td>2 · Reason + prove</td><td>Flags likely authorisation-ordering defects, then stands up an ephemeral copy of <i>your</i> source and confirms by reading the victim’s state back — not by trusting the attacker’s status code.</td></tr>
+    <tr><td>3 · Dynamic</td><td>Same class of defect, from the outside, against a running instance you have authorised in writing. Gated in code, not in a warning.</td></tr>
+    <tr><td>4 · Remediate</td><td>Ticket + draft PR carrying the evidence. Re-runs the exact same check. Status becomes <code>fixed-verified</code> only when it no longer reproduces.</td></tr>
+  </tbody>
+</table>
+<p>The flagship fixture bug is the reason the verifier does not trust HTTP status: the attacker receives <b>404</b> while the victim’s notes are still destroyed. A tool that believed the reply would call it safe and be exactly wrong.</p>
+
+<h2 id="when">When and where to use it</h2>
+<div class="pair">
+  <div class="box use">
+    <h3>Use it when</h3>
+    <ul>
+      <li>A colleague shipped an internal Express app and asked you to “check it” before it goes anywhere. Afternoon review, source on disk.</li>
+      <li>You need a CI gate that fails on <code>verified-exploitable</code>, not on every linter nit.</li>
+      <li>You are doing first-pass due diligence on a Node service you are allowed to test, and you want evidence rather than a tool-generated opinion.</li>
+      <li>You want a GRC team to see what “prove the control” looks like on application security — the same thesis as <a href="https://rootcawsllc.github.io/proofplane/">proofplane</a>.</li>
+    </ul>
+  </div>
+  <div class="box dont">
+    <h3>Do not use it when</h3>
+    <ul>
+      <li>You do not have authorisation. Layer 3 will refuse without a complete authorisation record <i>and</i> <code>--authorized</code>. That is not a prompt you can click through.</li>
+      <li>The target is not yours to copy. Layer 2 runs a local process sandbox of source you already have. Treat it as you would running the project’s own tests.</li>
+      <li>You need a dashboard, a scheduler, or multi-repo orchestration. Those are wrappers you build around the CLI. The tool exits with a status code.</li>
+      <li>You want every class of bug. It goes deep on broken object-level authorisation and a small static rule set. It is not a “finds everything” scanner.</li>
+    </ul>
+  </div>
+</div>
+
+<h2 id="how">How to use it</h2>
+<p>Node 22+. No API key for the default path. The commands below are the ones you run against <b>this repository’s fixtures</b> — deliberately vulnerable sample apps that ship with the tool. That is how you learn it. Pointing Layer 3 at anything else requires a written authorisation record in <code>targets.yaml</code>.</p>
+<p><b>1. Install and confirm the suite.</b></p>
+<pre>git clone https://github.com/RootCawsLLC/proofscan.git
+cd proofscan
+npm install
+npm run build
+npm test</pre>
+<p>The suite includes a <b>clean</b> fixture on which every rule must stay silent. That is the half of a scanner test suite that usually gets skipped, and it is the half that decides whether anyone will keep using the tool.</p>
+<p><b>2. Layer 1 against the vulnerable fixture</b> — static only, no network:</p>
+<pre>node dist/cli.js scan --path test/fixtures/repo/vulnerable</pre>
+<p>Read the <b>coverage block first</b>. <code>ran</code>, <code>not_installed</code>, <code>no_input</code>, <code>failed</code>, and <code>skipped</code> are different facts. Trivy against a project with no lockfile returns no results — not an error, just nothing. Reported as “0 dependency vulnerabilities,” that is a lie by omission. The coverage block exists so that lie cannot hide.</p>
+<p><b>3. Layer 2 against the same fixture</b> — reason, then prove, in a throwaway copy of that fixture:</p>
+<pre>node dist/cli.js scan --path test/fixtures/repo/vulnerable --layers static,ai-reasoning</pre>
+<p>The default reasoner is <code>heuristic</code>: deterministic, no network. A candidate is not reported as real on the reasoner’s word. Status stays <code>unverified-flagged</code> until the sandbox demonstrates a cross-user state change.</p>
+<p><b>4. Acceptance checks</b> — the documented path that clones the public FlaudeCode fixture and asserts expected findings:</p>
+<pre>npm run acceptance
+npm run acceptance:phase2
+npm run acceptance:agnostic
+npm run acceptance:phase4</pre>
+<p>Layer 3 (<code>acceptance:phase3</code>) talks to a running fixture you started locally and is gated the same way a real target is. Do not point it at a system you have not been authorised to test.</p>
+<p><b>5. After a verified finding, close the loop.</b></p>
+<pre>node dist/cli.js remediate --store test/fixtures/repo/vulnerable
+node dist/cli.js reverify  --store test/fixtures/repo/vulnerable --fix &lt;fixed-copy&gt;
+node dist/cli.js audit verify --store test/fixtures/repo/vulnerable</pre>
+<p>Exit codes: <code>0</code> clean (or below <code>--fail-on</code>), <code>1</code> a finding met the threshold (or a fix still reproduces), <code>2</code> refused or failed to run. That is what CI binds to.</p>
+
+<h2 id="org">Take it into your organisation</h2>
+<ol>
+  <li><b>Start with Layer 1 in CI</b> on repositories you own. Fail the build on <code>--fail-on high</code> or on <code>verified-exploitable</code> once Layer 2 is in the pipeline. Do not fail on every low-severity validation nit on day one — you will train people to ignore the gate.</li>
+  <li><b>Treat coverage as a control metric.</b> A pull request that drops Semgrep from <code>ran</code> to <code>not_installed</code> is a finding about the pipeline, not a clean scan.</li>
+  <li><b>Layer 3 is a penetration-test activity.</b> The authorisation record (<code>authorized_by</code>, <code>authorized_at</code>, <code>authorization_basis</code>, <code>runtime_base_url</code>) is the durable evidence of permission. The flag is a per-run confirmation. Both are required. Put the record in change-management, not in a Slack message.</li>
+  <li><b>Do not attach a loss figure to a finding.</b> A published breach study fills two nodes of a FAIR tree. A finding is a statement about one weakness in one codebase. Multiplying them invents a number with a citation and no measurement.</li>
+  <li><b>Re-verify the fix with the same check.</b> A ticket without a failing-then-passing re-run is a request, not a closed control. Layer 4 is that loop; the ticket sink ships as files so you can wire Jira or GitHub with your own credentials.</li>
+</ol>
+<p>Playbooks — one-off review, enterprise wrapper, M&amp;A, confirming a reported issue — are in <a href="https://github.com/RootCawsLLC/proofscan/blob/main/docs/USE-CASES.md">docs/USE-CASES.md</a>. The plain-language intro is <a href="https://github.com/RootCawsLLC/proofscan/blob/main/docs/OVERVIEW.md">docs/OVERVIEW.md</a>.</p>
+
+<h2 id="output">What a run looks like</h2>
+<p>These images are generated from the bytes the CLI actually printed against fixtures, so they cannot drift from the tool. They are recordings of fixture runs, not a hosted scanner.</p>
+<figure>
+  <img src="docs/img/proofscan-verify.svg" alt="Terminal recording of a proofscan Layer 2 run against the fixture. Coverage lists which scanners ran. One high-severity authorisation finding is marked verified-exploitable after a cross-user state change.">
+  <figcaption>Layer 2 against the fixture: coverage first, then a finding that earned verified-exploitable by a victim-side state change — not by the attacker’s 404.</figcaption>
+</figure>
+<figure>
+  <img src="docs/img/proofscan-scan.svg" alt="Terminal recording of a Layer 1-only proofscan run showing static findings and the coverage block.">
+  <figcaption>Layer 1 only, for comparison. Same fixture, no sandbox, no proof step.</figcaption>
+</figure>
+<figure>
+  <img src="docs/img/proofscan-dynamic.svg" alt="Terminal recording of a Layer 3 dynamic run against a local fixture instance.">
+  <figcaption>Layer 3 against a local fixture instance. Same defect class, no source access, authorisation gate in force.</figcaption>
+</figure>
+
+<h2 id="limits">Honest limits</h2>
+<div class="note">
+  <b><code>verified-exploitable</code> means one specific thing:</b> a second synthetic identity
+  performed the flagged mutation against the first user’s resource, and the first user’s stored
+  data changed, in a faithful copy (or an authorised running instance). It is not a statement
+  about your production topology.
+  The default Layer 2 sandbox is a local process, not a container. Built-in rules are
+  JavaScript/TypeScript and Express-shaped. A scanner that did not run is reported as such.
+  The audit chain detects an edit, not a full rewrite.
+  Full list:
+  <a href="https://github.com/RootCawsLLC/proofscan#honest-limits">README · Honest limits</a>.
+</div>
+
+<footer>
+  Source, rules, playbooks:
+  <a href="https://github.com/RootCawsLLC/proofscan">github.com/RootCawsLLC/proofscan</a>
+  · Portfolio:
+  <a href="https://xnasusx.github.io/portfolio/#builds">xnasusx.github.io/portfolio</a><br>
+  Copyright &copy; 2026 RootCaws LLC &middot; AGPL-3.0-or-later
+</footer>
+
+</div></body>
+</html>
