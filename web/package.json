@@ -1,0 +1,26 @@
+{
+  "name": "proofscan-web",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "Hosted demo GUI for proofscan. Runs the real scanner in-process against a bundled sandbox target or bring-your-own source, and shows findings, the exploit that proved each one, and the hash-chained audit log.",
+  "scripts": {
+    "dev": "next dev -p 3200",
+    "build": "next build",
+    "start": "next start -p 3200",
+    "lint": "next lint"
+  },
+  "dependencies": {
+    "next": "^15.5.25",
+    "proofscan": "file:..",
+    "react": "18.3.1",
+    "react-dom": "18.3.1",
+    "server-only": "0.0.1"
+  },
+  "devDependencies": {
+    "@types/node": "20.14.9",
+    "@types/react": "18.3.3",
+    "@types/react-dom": "18.3.0",
+    "typescript": "5.5.3"
+  }
+}

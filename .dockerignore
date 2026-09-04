@@ -1,0 +1,9 @@
+**/node_modules
+**/.next
+**/dist
+.git
+web/.env*.local
+**/*.log
+source.zip
+infra
+docs
