@@ -39,7 +39,7 @@ finds and verifies *its* IDOR with zero app-specific config — see
 put it in a programme: https://rootcawsllc.github.io/proofscan/
 
 **Run it in your browser** — a hosted demo that runs the real scanner against a sandboxed
-target (or your own pasted source), no install: @@GUI_URL@@
+target (or your own pasted source), no install: https://7sxe3zm93u.us-east-1.awsapprunner.com
 
 ![Terminal output of a proofscan run with Layer 2 enabled against the FlaudeCode
 fixture. The scanner coverage block lists builtin, gitleaks and a heuristic
