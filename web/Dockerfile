@@ -5,7 +5,7 @@
 #   docker build -f web/Dockerfile -t <repo>:<tag> .
 
 # ---- build: compile the tool, then the web app ----
-FROM node:22-bookworm-slim AS build
+FROM public.ecr.aws/docker/library/node:22-bookworm-slim AS build
 WORKDIR /repo
 # python3/make/g++ so the demo sandbox's native deps (better-sqlite3) can build
 # from source if no prebuilt binary matches the runtime's Node ABI.
@@ -26,7 +26,7 @@ COPY web ./web
 RUN cd web && npm run build
 
 # ---- runner: run `next start` with the full tree in place ----
-FROM node:22-bookworm-slim AS runner
+FROM public.ecr.aws/docker/library/node:22-bookworm-slim AS runner
 WORKDIR /repo
 ENV NODE_ENV=production
 ENV PORT=3200
