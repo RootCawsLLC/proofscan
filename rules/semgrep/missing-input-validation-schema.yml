@@ -46,7 +46,7 @@ rules:
       - metavariable-regex:
           metavariable: $PATH
           regex: (?i).*(login|signin|sign-in|log-in|register|signup|sign-up|password|reset|forgot|token|refresh|authenticate|otp|mfa|2fa).*
-      # No recognised schema call appears anywhere in the handler body.
+      # No recognized schema call appears anywhere in the handler body.
       - pattern-not-regex: \.(safeParse|parseAsync|safeParseAsync|validateAsync|validateSync)\s*\(
       - pattern-not-regex: \b(z|Joi|joi|yup|v|ajv)\s*\.\s*(object|string|number|boolean|array|shape)\s*\(
       - pattern-not-regex: \b(celebrate|checkSchema|validationResult|matchedData)\s*\(

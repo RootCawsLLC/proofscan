@@ -2,21 +2,21 @@
 
 Layer 2 needs the source: it inventories mutation handlers, reasons about them,
 and verifies against a sandboxed copy. Layer 3 needs **only a running instance**.
-It is the same defect class — broken object-level authorisation, where one user
+It is the same defect class — broken object-level authorization, where one user
 can act on another's resource — approached from the outside, so it works against
 a staging deployment or any target you can reach over HTTP without repo access.
 
 Run it with `--layers dynamic-fuzzer` against a target that has a
-`runtime_base_url` and a complete authorisation record. Unlike Layer 2 (which
+`runtime_base_url` and a complete authorization record. Unlike Layer 2 (which
 exercises an ephemeral copy of local source), Layer 3 sends live traffic to a
-**real, operator-supplied** system, so it is gated — see *Authorisation* below.
+**real, operator-supplied** system, so it is gated — see *Authorization* below.
 
 ## What it does
 
 1. **Route discovery.** From the target's OpenAPI/Swagger document if it serves
    one (tried at the usual paths), and/or from a `dynamic.resources` manifest in
    `targets.yaml`. The unit of testing is a *resource collection* — a create
-   endpoint plus the id-parameterised operations a non-owner should be denied —
+   endpoint plus the id-parameterized operations a non-owner should be denied —
    because cross-user testing needs the create/attack pairing, not a flat URL
    list. Crawling/enumeration is a deliberate non-goal (a later phase).
 
@@ -26,7 +26,7 @@ exercises an ephemeral copy of local source), Layer 3 sends live traffic to a
    where the token lives in the response) is configurable and defaults to the
    common `{email, password} -> {token}` shape.
 
-3. **Differential authorisation testing.** For each id-parameterised resource:
+3. **Differential authorization testing.** For each id-parameterized resource:
    identity A creates an object (and a child record where the resource has one),
    then identity B attempts each method against A's object. The verdict is
    decided by reading **A's state back as A**, before and after B's request —
@@ -62,18 +62,18 @@ the network (`src/dynamic/client.ts`), so they hold for the whole layer:
   entry, so there is a full account of what the tool did to the running target,
   including requests that failed.
 
-## Authorisation
+## Authorization
 
-This is the layer the authorisation gate was built for. A `dynamic-fuzzer` run
+This is the layer the authorization gate was built for. A `dynamic-fuzzer` run
 requires **both**:
 
 - a complete record in `targets.yaml` — `authorized_by`, `authorized_at`,
   `authorization_basis`, and `runtime_base_url`; and
 - `--authorized` on the invocation.
 
-Neither alone is sufficient, so an authorisation cannot be conjured by a flag at
+Neither alone is sufficient, so an authorization cannot be conjured by a flag at
 the moment of the scan. A run without a record is refused with an explanation.
-The difference between authorised security tooling and unauthorised access
+The difference between authorized security tooling and unauthorised access
 tooling is whether permission actually exists, so it is enforced in code.
 
 ## Configuration
@@ -102,7 +102,7 @@ targets:
       resources:                        # or rely on OpenAPI auto-discovery
         - name: tasks
           collection: /api/tasks        # POST here to create; response has {id}
-          item: /api/tasks/:id          # id-parameterised operations
+          item: /api/tasks/:id          # id-parameterized operations
           methods: [GET, PUT, DELETE]
           child: /api/tasks/:id/notes   # optional; catches cascade side-effects
 ```
@@ -124,7 +124,7 @@ are not false-positived.
 ## Limits
 
 - **Route shape.** Testing needs a create endpoint that returns the new id and an
-  id-parameterised item path. Resources without a discoverable create are skipped
+  id-parameterized item path. Resources without a discoverable create are skipped
   (there is nothing to attack), and reported as skipped rather than silently
   dropped.
 - **Auth shape.** The default flow is token-in-JSON-body. Cookie-session auth,

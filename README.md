@@ -2,18 +2,18 @@
 
 A layered, target-agnostic application flaw scanner. Four layers ship today:
 
-- **Layer 1 — deterministic static analysis** for authorisation, secret, CORS,
+- **Layer 1 — deterministic static analysis** for authorization, secret, CORS,
   rate-limit, input-validation and schema-drift defects, with per-scanner
   coverage reporting and a hash-chained audit log.
 - **Layer 2 — AI-reasoning + sandboxed verification** for business-logic
-  authorisation defects (a mutation that runs before the code checks who owns
+  authorization defects (a mutation that runs before the code checks who owns
   the resource). A candidate is not reported as real until a generated exploit
   has run against a sandboxed copy of the target and demonstrated impact.
 - **Layer 3 — dynamic BOLA/IDOR fuzzer** for the same defect class from the
   outside: pointed at a *running* instance with no source access, it registers
   two synthetic identities and has one attack the other's resource, deciding by
   observable state change. This is the layer that sends live traffic to a real
-  system, so it is gated on an authorisation record.
+  system, so it is gated on an authorization record.
 - **Layer 4 — remediation loop**: turns each verified finding into a ticket and
   a draft PR carrying the repro evidence, and — the part that matters —
   re-verifies a fix by re-running the exact exploit, flipping the finding to
@@ -43,7 +43,7 @@ target (or your own pasted source), no install: https://7sxe3zm93u.us-east-1.aws
 
 ![Terminal output of a proofscan run with Layer 2 enabled against the FlaudeCode
 fixture. The scanner coverage block lists builtin, gitleaks and a heuristic
-reasoner as having run. Finding 4 is a high-severity authorisation-ordering
+reasoner as having run. Finding 4 is a high-severity authorization-ordering
 defect in DELETE /api/tasks/:id at server.js:223, carrying a green "verified:"
 line: identity B issued the delete against identity A's resource, received a 404,
 yet a note belonging to A was destroyed — a cross-user mutation confirmed by
@@ -59,7 +59,7 @@ converter, so it cannot drift from what the tool actually prints.
 # Layer 1 only (static, fast, no network):
 npm install && npm run build && node dist/cli.js scan --path ../some-repo
 
-# Layers 1 + 2 (adds authorisation-ordering detection with sandboxed verification):
+# Layers 1 + 2 (adds authorization-ordering detection with sandboxed verification):
 node dist/cli.js scan --path ../some-repo --layers static,ai-reasoning
 
 # Layer 3 (dynamic fuzzer against a running instance; gated — see below):
@@ -78,7 +78,7 @@ The coverage block prints before the findings on purpose. See
 Static scanners are good at defects with a known shape and structurally blind to
 defects that are only wrong in context. An endpoint that deletes a resource
 before checking who owns it is syntactically unremarkable; no pattern matches it,
-because the pattern *is* the ordering. That class — business-logic authorisation
+because the pattern *is* the ordering. That class — business-logic authorization
 flaws — is what the full design targets, and it is why verification matters:
 a model can plausibly describe such a bug in code that does not have one, so a
 finding is worth reporting only once an exploit has actually run.
@@ -128,7 +128,7 @@ false-negative behavior are documented per rule in [docs/RULES.md](docs/RULES.md
 
 ### Layer 2: reasoning, then proof
 
-Static rules are structurally blind to authorisation-ordering defects — an
+Static rules are structurally blind to authorization-ordering defects — an
 endpoint that deletes a resource before checking who owns it is syntactically
 unremarkable, because the *pattern is the ordering*. Layer 2 (`--layers
 static,ai-reasoning`) is built for that class, in three steps:
@@ -165,7 +165,7 @@ wrong. Impact is a change in the victim's data, so that is what gets measured.
 ### Layer 3: the same bug, found from the outside
 
 Layer 2 needs the source. Layer 3 (`--layers dynamic-fuzzer`) needs only a
-**running instance** — it finds the same broken-object-level-authorisation class
+**running instance** — it finds the same broken-object-level-authorization class
 against a staging deployment or any HTTP target you can reach, with no repo
 access. It discovers routes from the target's OpenAPI document or a supplied
 `dynamic.resources` manifest, registers two synthetic identities through the
@@ -194,19 +194,19 @@ meaningful next to what actually executed. `not_installed` and `no_input` are
 distinct from a clean run, and both are distinct from each other: one means the
 tool was absent, the other means the tool ran and had nothing it could analyze.
 
-### The authorisation gate
+### The authorization gate
 
 Layer 3 creates test accounts against a **running, operator-supplied**
 application and attempts cross-user access. That is the same activity as an
-authorised penetration test, and the difference between authorised security
+authorized penetration test, and the difference between authorized security
 tooling and unauthorised access tooling is whether permission actually exists —
 so it is enforced in code rather than documented as a warning.
 
-A dynamic layer requires **both** a complete authorisation record for the target
+A dynamic layer requires **both** a complete authorization record for the target
 in `targets.yaml` (`authorized_by`, `authorized_at`, `authorization_basis`, and a
 `runtime_base_url`) **and** `--authorized` on the invocation. The record is the
 durable evidence of who granted permission and on what basis; the flag is a
-per-run confirmation of intent. Requiring both means an authorisation cannot be
+per-run confirmation of intent. Requiring both means an authorization cannot be
 conjured by a flag alone at the moment of the scan. A run without a record is
 refused with an explanation.
 
@@ -243,9 +243,9 @@ npm test
 ordering analysis, the exploit-plan **inference** against two differently-shaped
 apps (proving the auth flow, resource shape and field names are derived, not
 hardcoded), the dynamic layer's rate-limiter/backoff (with an injected clock)
-and the shared differential-authorisation engine (including the 404-but-mutated
+and the shared differential-authorization engine (including the 404-but-mutated
 case, via a scripted client), the hash chain's tamper detection, the
-authorisation gate's refusals, and the external adapters' parsers against **real
+authorization gate's refusals, and the external adapters' parsers against **real
 captured scanner output** rather than hand-written mocks — the Trivy fixture is
 25 genuine CVEs from Trivy 0.73.0, and the Gitleaks parser is built against
 verified 8.30.1 output.
@@ -253,7 +253,7 @@ verified 8.30.1 output.
 The suite includes a **clean negative-control fixture**
 (`test/fixtures/repo/clean/server.js`): the same application written correctly,
 on which every rule must stay silent — and on which the Layer 2 inventory finds
-no authorisation-ordering candidate. This is the half of a scanner's test suite
+no authorization-ordering candidate. This is the half of a scanner's test suite
 that usually gets skipped, and it is the half that determines whether the tool is
 usable — a rule that fires on correct code produces false positives, which is how
 scanners lose their audience.
@@ -333,7 +333,7 @@ verification layer that only runs where Docker is installed cannot be
 demonstrated at all. The local sandbox shares the host kernel and network
 namespace and offers no real containment — treat it as a functional stand-in, run
 Layer 2 only against targets you would run locally anyway, and prefer the Docker
-provider once it lands. The authorisation gate and the "only authorised targets"
+provider once it lands. The authorization gate and the "only authorized targets"
 rule apply regardless of provider.
 
 **Layer 2 verification is Node/Express-shaped.** The sandbox recognizes a Node
@@ -353,7 +353,7 @@ operation list and nothing else: no tools, no filesystem, no network, no target
 credentials.
 
 **A safety classifier can decline to assess a handler.** The `anthropic` backend
-asks a model to describe how to exploit a real authorisation bug, which sits near
+asks a model to describe how to exploit a real authorization bug, which sits near
 the cyber-content boundary; a refusal is handled (server-side fallback, then a
 preserved low-confidence candidate) rather than silently dropping the handler,
 but it means the model backend is not guaranteed to assess every candidate. The
@@ -457,10 +457,10 @@ instances are dropped by `--min-severity medium`.
 | [docs/USE-CASES.md](docs/USE-CASES.md) | Playbooks: a one-off review of a vibe-coded app, running at enterprise scale, third-party/M&A due diligence, and confirming a reported vulnerability |
 | [docs/RULES.md](docs/RULES.md) | Every rule: what it flags, severity rationale, known false positives and negatives |
 | [docs/LAYER2.md](docs/LAYER2.md) | The reasoning + verification pipeline: inventory, rubric, sandbox, and how a finding earns `verified-exploitable` |
-| [docs/LAYER3.md](docs/LAYER3.md) | The dynamic fuzzer: route discovery, synthetic identities, differential testing, rate limiting, and the authorisation gate |
+| [docs/LAYER3.md](docs/LAYER3.md) | The dynamic fuzzer: route discovery, synthetic identities, differential testing, rate limiting, and the authorization gate |
 | [docs/LAYER4.md](docs/LAYER4.md) | The remediation loop: ticket + draft-PR generation, and re-verifying a fix by re-running the exploit |
 | [rules/semgrep/README.md](rules/semgrep/README.md) | The standalone Semgrep rules, validation results, and why the built-in engine is authoritative on severity |
-| [targets.example.yaml](targets.example.yaml) | Target registry format, the authorisation fields, and the dynamic-layer config |
+| [targets.example.yaml](targets.example.yaml) | Target registry format, the authorization fields, and the dynamic-layer config |
 
 A [Layer 1-only run](docs/img/proofscan-scan.svg) shows the static output on its
 own, for comparison with the Layer 2 run above.
@@ -469,7 +469,7 @@ own, for comparison with the Layer 2 run above.
 
 `test/fixtures/repo/vulnerable/` and `test/fixtures/repo/second-app/` contain
 strings like `'demo-jwt-secret-change-me'` and `'placeholder-token-secret-change-me'`.
-They are fabricated placeholders written for the test suite and authorise nothing
+They are fabricated placeholders written for the test suite and authorize nothing
 anywhere. A scanner needs positive cases to fire on; each fixture file says so in
 a header comment.
 

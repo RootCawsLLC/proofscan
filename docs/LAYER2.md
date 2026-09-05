@@ -50,7 +50,7 @@ arrives with the ordered facts attached.
 
 Each candidate gets exactly one question (`src/analyzers/reasoning/rubric.ts`):
 
-> Does an authorisation/ownership check execute and short-circuit before this
+> Does an authorization/ownership check execute and short-circuit before this
 > mutation runs, scoped to the same resource identifier the mutation touches? If
 > not, flag it and explain what a caller would need to do to exploit it.
 
@@ -68,7 +68,7 @@ source and the operation list and nothing else — it cannot read files, run
 commands, or reach the network; the answer is constrained to a JSON schema, not
 parsed out of prose; the system prompt is byte-stable across candidates so it
 caches; and no target credential ever enters a prompt. Because the prompt asks a
-model to describe exploiting a real authorisation bug, a safety classifier can
+model to describe exploiting a real authorization bug, a safety classifier can
 decline (`stop_reason: "refusal"`). That is handled — server-side fallback first,
 then the candidate is preserved as a low-confidence finding — never silently
 dropped.
@@ -82,7 +82,7 @@ reasoner says is reported as real.
 Before verification runs, `src/exploit/infer.ts` derives an **exploit plan** from
 the same route inventory: how the target authenticates (register/login paths,
 the credential field names each handler reads, the token field it returns) and
-what to attack (each id-parameterised resource, its create endpoint, the fields
+what to attack (each id-parameterized resource, its create endpoint, the fields
 that create expects, and any child collection). Nothing about a particular app
 is baked in — FlaudeCode's `/api/register` + `{email, password}` + `token` and a
 different app's `/auth/signup` + `{username, passphrase}` + `accessToken` are
@@ -94,7 +94,7 @@ model feeds Layer 3, so both verifying layers share one engine
 ## 3. Sandboxed verification — where a candidate earns its status
 
 `src/verify/` stands up an **ephemeral copy** of the target
-(`src/verify/sandbox.ts`), runs the shared differential-authorisation engine
+(`src/verify/sandbox.ts`), runs the shared differential-authorization engine
 against it driven by the inferred plan (`src/verify/exploit.ts`), and tears it
 down. The sandbox injects an ephemeral value for whatever secret-shaped
 `process.env` variable the target reads (not a hardcoded `JWT_SECRET`), so an app

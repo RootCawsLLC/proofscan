@@ -174,8 +174,8 @@ as CVEs land against pinned versions.
   route `verified-exploitable` straight to an incident/ticket queue and
   `unverified-flagged` to a triage backlog. Don't page a human on a maybe.
 - **Governance & the audit trail.** Static and sandboxed runs touch no production
-  system, so they need no per-target authorisation. **Dynamic runs do** — they're
-  gated on the registry's authorisation record plus `--authorized`, and every
+  system, so they need no per-target authorization. **Dynamic runs do** — they're
+  gated on the registry's authorization record plus `--authorized`, and every
   live request is written to a hash-chained, append-only audit log. That log is
   your retained, tamper-evident record of what the program touched and when.
 
@@ -192,12 +192,12 @@ evidence-backed read on its security before you sign.
 - **If you're given source** (an escrow copy, a data-room checkout): run it like
   [Use case 1](#use-case-1--the-one-off-review). Full layer coverage.
 - **If you only get a running demo instance:** point the dynamic layer at it — no
-  source required. This is exactly where the authorisation gate earns its keep,
+  source required. This is exactly where the authorization gate earns its keep,
   because you are testing someone else's system:
 
 ```bash
 # targets.yaml entry: source_type runtime_url, runtime_base_url, a dynamic
-# resource manifest, AND a written authorisation record.
+# resource manifest, AND a written authorization record.
 proofscan scan --target vendor-demo --targets targets.yaml \
   --layers dynamic-fuzzer --authorized
 ```
@@ -230,7 +230,7 @@ reproduce, and does it actually cause harm?**
 
 ### Reproduce it, don't debate it
 
-Point the dynamic layer at a staging instance (authorised, as in Use case 3) and
+Point the dynamic layer at a staging instance (authorized, as in Use case 3) and
 let the differential test settle it:
 
 ```bash
@@ -270,8 +270,8 @@ universal oracle.
 |---|---|---|---|
 | 1 · One-off review | static → ai-reasoning → remediate/reverify | the whole flow | nothing |
 | 2 · Enterprise scale | static → ai-reasoning (+ dynamic) per app | the scans, `--fail-on` gate, reverify gate, JSON output, audit log | scheduler, CI wiring, registry generation, results pipeline, dashboards |
-| 3 · Due diligence | dynamic-fuzzer (or full, if source) | dynamic layer, authorisation gate, audit log | the authorisation record and the memo |
-| 4 · Confirm a report | dynamic-fuzzer → reverify | reproduce + fix-gate + audit log | staging target + authorisation record |
+| 3 · Due diligence | dynamic-fuzzer (or full, if source) | dynamic layer, authorization gate, audit log | the authorization record and the memo |
+| 4 · Confirm a report | dynamic-fuzzer → reverify | reproduce + fix-gate + audit log | staging target + authorization record |
 
 The line between columns three and four is the whole point: proofscan gives you a
 proof engine and an honest status code. The program you build on top is yours —
