@@ -52,7 +52,7 @@ proofscan scan --path ./their-app --layers static,ai-reasoning --min-severity me
 The `heuristic` reasoner is the default: deterministic, free, and it already
 catches the common BOLA/IDOR shapes. Reach for `--reasoner anthropic` only when
 you want the model to nominate candidates on unusual handler shapes the pattern
-matcher can't recognise (needs the optional SDK and `ANTHROPIC_API_KEY`).
+matcher can't recognize (needs the optional SDK and `ANTHROPIC_API_KEY`).
 
 **4. (Optional) Exercise a running copy.** If they also handed you a running
 instance and you want the outside-in view, see the dynamic layer in
@@ -170,7 +170,7 @@ as CVEs land against pinned versions.
 - **Secrets.** `ANTHROPIC_API_KEY` comes from your platform's secrets manager,
   injected as an env var into the runner. It is never written to a file and never
   appears in a report (proofscan redacts secret excerpts).
-- **Results pipeline.** `--json` output → normalise → dedupe by fingerprint →
+- **Results pipeline.** `--json` output → normalize → dedupe by fingerprint →
   route `verified-exploitable` straight to an incident/ticket queue and
   `unverified-flagged` to a triage backlog. Don't page a human on a maybe.
 - **Governance & the audit trail.** Static and sandboxed runs touch no production
