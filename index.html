@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>proofscan — a scanner that proves the finding</title>
-<meta name="description" content="A command-line application flaw scanner. A finding is verified-exploitable only when an executed check changed another user’s data. How to run it, when to use it, and how to put it in a programme.">
+<meta name="description" content="A command-line application flaw scanner. A finding is verified-exploitable only when an executed check changed another user’s data. How to run it, when to use it, and how to put it in a program.">
 <style>
 :root{
   --bg:#FAFAF8;--panel:#FFFFFF;--panel-2:#F5F1E8;--border:#e0e0e0;
@@ -151,7 +151,7 @@ node dist/cli.js reverify  --store test/fixtures/repo/vulnerable --fix &lt;fixed
 node dist/cli.js audit verify --store test/fixtures/repo/vulnerable</pre>
 <p>Exit codes: <code>0</code> clean (or below <code>--fail-on</code>), <code>1</code> a finding met the threshold (or a fix still reproduces), <code>2</code> refused or failed to run. That is what CI binds to.</p>
 
-<h2 id="org">Take it into your organisation</h2>
+<h2 id="org">Take it into your organization</h2>
 <ol>
   <li><b>Start with Layer 1 in CI</b> on repositories you own. Fail the build on <code>--fail-on high</code> or on <code>verified-exploitable</code> once Layer 2 is in the pipeline. Do not fail on every low-severity validation nit on day one — you will train people to ignore the gate.</li>
   <li><b>Treat coverage as a control metric.</b> A pull request that drops Semgrep from <code>ran</code> to <code>not_installed</code> is a finding about the pipeline, not a clean scan.</li>

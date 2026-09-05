@@ -36,7 +36,7 @@ finds and verifies *its* IDOR with zero app-specific config — see
 `npm run acceptance:agnostic`.
 
 **Live guide** — what it does, when to use it, how to run it against the fixtures, and how to
-put it in a programme: https://rootcawsllc.github.io/proofscan/
+put it in a program: https://rootcawsllc.github.io/proofscan/
 
 **Run it in your browser** — a hosted demo that runs the real scanner against a sandboxed
 target (or your own pasted source), no install: https://7sxe3zm93u.us-east-1.awsapprunner.com
@@ -107,7 +107,7 @@ is precisely this case.
 
 ## What it does
 
-Four scanners, normalised into one findings list:
+Four scanners, normalized into one findings list:
 
 - **Built-in AST engine** — no external dependency, always runs. Six rules over
   JavaScript and TypeScript, built on the TypeScript compiler API. It models the
@@ -124,7 +124,7 @@ Four scanners, normalised into one findings list:
   context. Severity remains the sort key; exploitability is never used to reorder.
 
 The rules, their severity rationale, and their false-positive and
-false-negative behaviour are documented per rule in [docs/RULES.md](docs/RULES.md).
+false-negative behavior are documented per rule in [docs/RULES.md](docs/RULES.md).
 
 ### Layer 2: reasoning, then proof
 
@@ -192,7 +192,7 @@ Every report states, per scanner, whether it `ran`, was `not_installed`, had
 `no_input`, `failed`, or was `skipped` — with the reason. A findings list is only
 meaningful next to what actually executed. `not_installed` and `no_input` are
 distinct from a clean run, and both are distinct from each other: one means the
-tool was absent, the other means the tool ran and had nothing it could analyse.
+tool was absent, the other means the tool ran and had nothing it could analyze.
 
 ### The authorisation gate
 
@@ -305,9 +305,9 @@ not confirmed impact.
 proofscan tells you an ownership boundary failed in a faithful copy of your
 application. It does not tell you what that would cost, and it is not going to: a
 published loss distribution describes what incidents cost across a population of
-organisations, while a finding describes one weakness in one codebase. Multiplying
+organizations, while a finding describes one weakness in one codebase. Multiplying
 the two yields a number with a citation attached and no measurement behind it,
-which is how risk-based prioritisation earns the reputation it has. Severity here
+which is how risk-based prioritization earns the reputation it has. Severity here
 is a sort key for triage, never an input to a financial model. For what defensible
 loss figures actually rest on — and how thin the evidence is even where it exists —
 see [risk-benchmarks](https://github.com/RootCawsLLC/risk-benchmarks).
@@ -336,7 +336,7 @@ Layer 2 only against targets you would run locally anyway, and prefer the Docker
 provider once it lands. The authorisation gate and the "only authorised targets"
 rule apply regardless of provider.
 
-**Layer 2 verification is Node/Express-shaped.** The sandbox recognises a Node
+**Layer 2 verification is Node/Express-shaped.** The sandbox recognizes a Node
 target by its `package.json` and a conventional entry file, repairs native
 dependencies for the current runtime, and drives a register → create → attack →
 read-back exploit against a JSON/token API. A target it cannot confidently start,
@@ -364,13 +364,13 @@ Go or Ruby service and the route, CORS, secret-fallback and validation rules
 contribute nothing — the run reports that as a coverage note rather than
 returning a clean result. Schema drift is text-based and covers `.sql` too.
 
-**Express-style routing only.** Routes are recognised as
+**Express-style routing only.** Routes are recognized as
 `<obj>.<method>('<path>', …)` with a string-literal path. Routes whose path is a
 variable or a RegExp are missed. NestJS decorators, Fastify plugin registration,
-Koa routers and framework-level guards are not modelled.
+Koa routers and framework-level guards are not modeled.
 
 **Single-file analysis for middleware.** Authentication, rate limiting and
-validation are recognised in the route's own chain or in an earlier `app.use` in
+validation are recognized in the route's own chain or in an earlier `app.use` in
 the same file. A gate applied in another module, at an API gateway, at a load
 balancer or by a framework decorator is invisible, so those routes are reported
 as unprotected. This is the largest source of false positives in a real
@@ -399,7 +399,7 @@ its rules did not examine.
 
 **Scanning proofscan with proofscan reports 11 findings.** They come from
 `test/fixtures/repo/vulnerable/`, which is deliberately vulnerable. That is
-correct behaviour, not a defect in the tool or in its own source.
+correct behavior, not a defect in the tool or in its own source.
 
 **No taint tracking or constant propagation.** `proofscan.hardcoded-fallback-secret`
 matches the literal in place; a fallback assembled at a distance is missed. The
@@ -421,7 +421,7 @@ bucket, a witness service. Not implemented; `audit verify` says so in its own
 output rather than overstating what it proved.
 
 **The store is JSON files, not Postgres.** The spec's Postgres schema — including
-the `verification_runs` table Layer 2 populates — is modelled faithfully: field
+the `verification_runs` table Layer 2 populates — is modeled faithfully: field
 names are snake_case throughout so the JSON shape and the eventual table shape
 match 1:1. But persistence is `<target>/.proofscan/runs/*.json` for now.
 
@@ -501,5 +501,5 @@ service, the AGPL requires you to offer your users the modified source under the
 same terms.
 
 The AGPL covers this project's own code. The scanners proofscan invokes
-(Semgrep, Gitleaks, Trivy) are separate projects under their own licences and are
+(Semgrep, Gitleaks, Trivy) are separate projects under their own licenses and are
 neither vendored nor modified here.

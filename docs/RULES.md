@@ -1,8 +1,8 @@
-# Rule catalogue
+# Rule catalog
 
 Every rule, what it flags, how severity is decided, and where it breaks down. The
 last column is the important one: a rule whose false-positive and false-negative
-behaviour is undocumented cannot be triaged, only guessed at.
+behavior is undocumented cannot be triaged, only guessed at.
 
 Layer 1 rule IDs are shared between the built-in AST engine and the Semgrep rule
 files. When both fire on the same line the finding is reported once with
@@ -48,7 +48,7 @@ whenever the variable is unset. This is measured, not asserted:
 attached to tickets and pasted into chat; echoing the secret would make the
 report a second copy of the leak.
 
-**Limits.** Only `process.env` is recognised — not `os.environ`, `ENV[]`,
+**Limits.** Only `process.env` is recognized — not `os.environ`, `ENV[]`,
 `System.getenv`, or a config library's `get('KEY', 'default')`. Fallbacks
 assembled at a distance (`const d = 'abc'; … || d`) are missed, since the rule
 does not do constant propagation. Placeholder literals (`''`, `changeme`,
@@ -64,14 +64,14 @@ an origin that reflects the caller: `origin: true`, `origin: req.headers.origin`
 or a callback that answers `cb(null, true)` with no allowlist check.
 
 **Severity** `high` for a reflected origin. `low` for `origin: '*'` with
-credentials, because browsers refuse to honour the wildcard when credentials are
+credentials, because browsers refuse to honor the wildcard when credentials are
 requested — it is a configuration error to correct, not an exposure.
 
 `origin: true` in the `cors` package does not mean "allow `*`". It echoes back
 whatever `Origin` the request carried, which is strictly worse than the wildcard:
 the wildcard is blocked by the browser, the echo is not.
 
-**Limits.** Only recognises the `cors` package's call shape. Manually written
+**Limits.** Only recognizes the `cors` package's call shape. Manually written
 `Access-Control-Allow-*` headers are not covered, nor is CORS configured in a
 reverse proxy, an API gateway, or framework middleware other than `cors`. The
 callback heuristic looks for allowlist-ish operations (`includes`, `test`, `===`)
@@ -135,7 +135,7 @@ Scoped to credential routes on purpose. Every endpoint benefits from a limiter,
 and flagging all of them produces a wall of findings nobody reads. GET requests
 on auth paths are excluded: those render a form, they do not accept a guess.
 
-**Limits.** A limiter is recognised by name (`rateLimit`, `throttle`,
+**Limits.** A limiter is recognized by name (`rateLimit`, `throttle`,
 `slowDown`, `limiter`, `brute`, …) in the route's middleware chain or in an
 earlier `app.use` in the same file. A limiter applied in another module, at a
 load balancer, at Cloudflare, or by an API gateway is invisible, and the route
