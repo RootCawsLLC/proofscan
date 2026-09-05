@@ -1,24 +1,24 @@
 # proofscan target registry
 #
 # Copy to targets.yaml (which is gitignored) and edit. A real targets file can
-# name internal hosts and carry authorisation details, so it is deliberately not
+# name internal hosts and carry authorization details, so it is deliberately not
 # committed.
 #
-# The authorisation fields are not paperwork. The dynamic layers of this tool
+# The authorization fields are not paperwork. The dynamic layers of this tool
 # create test accounts against a running application and attempt cross-user
-# access — the same activity as an authorised penetration test. proofscan refuses
+# access — the same activity as an authorized penetration test. proofscan refuses
 # to run those layers against any target that does not carry a complete
-# authorisation record here, and refuses again unless --authorized is passed on
+# authorization record here, and refuses again unless --authorized is passed on
 # the invocation itself. Static analysis of source on your own disk is not gated.
 
 targets:
-  # Static-only target. No authorisation record needed, and none of the dynamic
+  # Static-only target. No authorization record needed, and none of the dynamic
   # layers will run against it.
   - name: flaudecode
     source_type: local_path
     source_uri: ./fixtures/FlaudeCode
 
-  # A target you own and intend to test live. Every authorisation field is
+  # A target you own and intend to test live. Every authorization field is
   # required before any dynamic layer will run.
   - name: my-app-staging
     source_type: local_path
@@ -43,7 +43,7 @@ targets:
       resources:
         - name: tasks
           collection: /api/tasks        # POST here to create; response carries {id}
-          item: /api/tasks/:id          # id-parameterised operations to test
+          item: /api/tasks/:id          # id-parameterized operations to test
           methods: [GET, PUT, DELETE]
           child: /api/tasks/:id/notes   # optional; catches cascade side-effects
 
@@ -67,7 +67,7 @@ targets:
         - { name: tasks, collection: /api/tasks, item: /api/tasks/:id, methods: [GET, PUT, DELETE] }
 
   # A third-party target under written engagement. Record the actual basis —
-  # "assumed fine" is not an authorisation.
+  # "assumed fine" is not an authorization.
   - name: client-engagement
     source_type: local_path
     source_uri: ../client-app
@@ -75,5 +75,5 @@ targets:
     authorized_by: jane.doe@client.example
     authorized_at: "2026-07-15"
     authorization_basis: >-
-      Signed penetration-test authorisation, engagement CL-2026-14, scope limited
+      Signed penetration-test authorization, engagement CL-2026-14, scope limited
       to test.client.example, window 2026-07-15 to 2026-08-15.

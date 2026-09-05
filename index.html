@@ -95,8 +95,8 @@ to deploy — this page is the walkthrough you can follow on a laptop, against f
   <thead><tr><th>Layer</th><th>What you get</th></tr></thead>
   <tbody>
     <tr><td>1 · Static</td><td>Built-in AST rules, plus Semgrep / Gitleaks / Trivy when they are on <code>PATH</code>. Fast, no network. Coverage is printed <i>before</i> findings, so “scanner not installed” cannot look like “clean.”</td></tr>
-    <tr><td>2 · Reason + prove</td><td>Flags likely authorisation-ordering defects, then stands up an ephemeral copy of <i>your</i> source and confirms by reading the victim’s state back — not by trusting the attacker’s status code.</td></tr>
-    <tr><td>3 · Dynamic</td><td>Same class of defect, from the outside, against a running instance you have authorised in writing. Gated in code, not in a warning.</td></tr>
+    <tr><td>2 · Reason + prove</td><td>Flags likely authorization-ordering defects, then stands up an ephemeral copy of <i>your</i> source and confirms by reading the victim’s state back — not by trusting the attacker’s status code.</td></tr>
+    <tr><td>3 · Dynamic</td><td>Same class of defect, from the outside, against a running instance you have authorized in writing. Gated in code, not in a warning.</td></tr>
     <tr><td>4 · Remediate</td><td>Ticket + draft PR carrying the evidence. Re-runs the exact same check. Status becomes <code>fixed-verified</code> only when it no longer reproduces.</td></tr>
   </tbody>
 </table>
@@ -116,16 +116,16 @@ to deploy — this page is the walkthrough you can follow on a laptop, against f
   <div class="box dont">
     <h3>Do not use it when</h3>
     <ul>
-      <li>You do not have authorisation. Layer 3 will refuse without a complete authorisation record <i>and</i> <code>--authorized</code>. That is not a prompt you can click through.</li>
+      <li>You do not have authorization. Layer 3 will refuse without a complete authorization record <i>and</i> <code>--authorized</code>. That is not a prompt you can click through.</li>
       <li>The target is not yours to copy. Layer 2 runs a local process sandbox of source you already have. Treat it as you would running the project’s own tests.</li>
       <li>You need a dashboard, a scheduler, or multi-repo orchestration. Those are wrappers you build around the CLI. The tool exits with a status code.</li>
-      <li>You want every class of bug. It goes deep on broken object-level authorisation and a small static rule set. It is not a “finds everything” scanner.</li>
+      <li>You want every class of bug. It goes deep on broken object-level authorization and a small static rule set. It is not a “finds everything” scanner.</li>
     </ul>
   </div>
 </div>
 
 <h2 id="how">How to use it</h2>
-<p>Node 22+. No API key for the default path. The commands below are the ones you run against <b>this repository’s fixtures</b> — deliberately vulnerable sample apps that ship with the tool. That is how you learn it. Pointing Layer 3 at anything else requires a written authorisation record in <code>targets.yaml</code>.</p>
+<p>Node 22+. No API key for the default path. The commands below are the ones you run against <b>this repository’s fixtures</b> — deliberately vulnerable sample apps that ship with the tool. That is how you learn it. Pointing Layer 3 at anything else requires a written authorization record in <code>targets.yaml</code>.</p>
 <p><b>1. Install and confirm the suite.</b></p>
 <pre>git clone https://github.com/RootCawsLLC/proofscan.git
 cd proofscan
@@ -144,7 +144,7 @@ npm test</pre>
 npm run acceptance:phase2
 npm run acceptance:agnostic
 npm run acceptance:phase4</pre>
-<p>Layer 3 (<code>acceptance:phase3</code>) talks to a running fixture you started locally and is gated the same way a real target is. Do not point it at a system you have not been authorised to test.</p>
+<p>Layer 3 (<code>acceptance:phase3</code>) talks to a running fixture you started locally and is gated the same way a real target is. Do not point it at a system you have not been authorized to test.</p>
 <p><b>5. After a verified finding, close the loop.</b></p>
 <pre>node dist/cli.js remediate --store test/fixtures/repo/vulnerable
 node dist/cli.js reverify  --store test/fixtures/repo/vulnerable --fix &lt;fixed-copy&gt;
@@ -155,7 +155,7 @@ node dist/cli.js audit verify --store test/fixtures/repo/vulnerable</pre>
 <ol>
   <li><b>Start with Layer 1 in CI</b> on repositories you own. Fail the build on <code>--fail-on high</code> or on <code>verified-exploitable</code> once Layer 2 is in the pipeline. Do not fail on every low-severity validation nit on day one — you will train people to ignore the gate.</li>
   <li><b>Treat coverage as a control metric.</b> A pull request that drops Semgrep from <code>ran</code> to <code>not_installed</code> is a finding about the pipeline, not a clean scan.</li>
-  <li><b>Layer 3 is a penetration-test activity.</b> The authorisation record (<code>authorized_by</code>, <code>authorized_at</code>, <code>authorization_basis</code>, <code>runtime_base_url</code>) is the durable evidence of permission. The flag is a per-run confirmation. Both are required. Put the record in change-management, not in a Slack message.</li>
+  <li><b>Layer 3 is a penetration-test activity.</b> The authorization record (<code>authorized_by</code>, <code>authorized_at</code>, <code>authorization_basis</code>, <code>runtime_base_url</code>) is the durable evidence of permission. The flag is a per-run confirmation. Both are required. Put the record in change-management, not in a Slack message.</li>
   <li><b>Do not attach a loss figure to a finding.</b> A published breach study fills two nodes of a FAIR tree. A finding is a statement about one weakness in one codebase. Multiplying them invents a number with a citation and no measurement.</li>
   <li><b>Re-verify the fix with the same check.</b> A ticket without a failing-then-passing re-run is a request, not a closed control. Layer 4 is that loop; the ticket sink ships as files so you can wire Jira or GitHub with your own credentials.</li>
 </ol>
@@ -164,7 +164,7 @@ node dist/cli.js audit verify --store test/fixtures/repo/vulnerable</pre>
 <h2 id="output">What a run looks like</h2>
 <p>These images are generated from the bytes the CLI actually printed against fixtures, so they cannot drift from the tool. They are recordings of fixture runs, not a hosted scanner.</p>
 <figure>
-  <img src="docs/img/proofscan-verify.svg" alt="Terminal recording of a proofscan Layer 2 run against the fixture. Coverage lists which scanners ran. One high-severity authorisation finding is marked verified-exploitable after a cross-user state change.">
+  <img src="docs/img/proofscan-verify.svg" alt="Terminal recording of a proofscan Layer 2 run against the fixture. Coverage lists which scanners ran. One high-severity authorization finding is marked verified-exploitable after a cross-user state change.">
   <figcaption>Layer 2 against the fixture: coverage first, then a finding that earned verified-exploitable by a victim-side state change — not by the attacker’s 404.</figcaption>
 </figure>
 <figure>
@@ -173,14 +173,14 @@ node dist/cli.js audit verify --store test/fixtures/repo/vulnerable</pre>
 </figure>
 <figure>
   <img src="docs/img/proofscan-dynamic.svg" alt="Terminal recording of a Layer 3 dynamic run against a local fixture instance.">
-  <figcaption>Layer 3 against a local fixture instance. Same defect class, no source access, authorisation gate in force.</figcaption>
+  <figcaption>Layer 3 against a local fixture instance. Same defect class, no source access, authorization gate in force.</figcaption>
 </figure>
 
 <h2 id="limits">Honest limits</h2>
 <div class="note">
   <b><code>verified-exploitable</code> means one specific thing:</b> a second synthetic identity
   performed the flagged mutation against the first user’s resource, and the first user’s stored
-  data changed, in a faithful copy (or an authorised running instance). It is not a statement
+  data changed, in a faithful copy (or an authorized running instance). It is not a statement
   about your production topology.
   The default Layer 2 sandbox is a local process, not a container. Built-in rules are
   JavaScript/TypeScript and Express-shaped. A scanner that did not run is reported as such.

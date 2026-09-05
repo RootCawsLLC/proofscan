@@ -87,7 +87,7 @@ work it out.
 
 ## `proofscan.unauthenticated-secret-exposure`
 
-**Flags** a route with no authentication or authorisation middleware that returns
+**Flags** a route with no authentication or authorization middleware that returns
 a response field whose name indicates credential material.
 
 **Severity** `high` when the value appears to be returned in full; `medium` when
@@ -209,7 +209,7 @@ collide deliberately.
 
 **Flags** an authenticated route handler that performs a request-driven database
 mutation before confirming the caller owns the resource — the IDOR / broken
-object-level authorisation class. Runs only under `--layers static,ai-reasoning`.
+object-level authorization class. Runs only under `--layers static,ai-reasoning`.
 Full pipeline detail in [LAYER2.md](LAYER2.md).
 
 **Severity** `high` by default; `medium` when the reasoner returns `low`
@@ -246,7 +246,7 @@ preserved as a low-confidence candidate, not dropped.
 **Flags** a cross-user access defect proven against a *running* target: an
 authenticated non-owner performed an operation on another user's resource and
 either got a success status or produced an observable change in the owner's data.
-Runs only under `--layers dynamic-fuzzer`, and only against an authorised target
+Runs only under `--layers dynamic-fuzzer`, and only against an authorized target
 (see [LAYER3.md](LAYER3.md)). No source is read.
 
 **Severity** `critical` for a destructive cross-user side effect (delete or
@@ -262,7 +262,7 @@ the verdict is read back as A. As in Layer 2, the decision is a victim-side stat
 change, not the attacker's HTTP status — the fixture bug returns 404 to the
 attacker while destroying the victim's child records.
 
-**Limits.** Needs a create endpoint that returns an id and an id-parameterised
+**Limits.** Needs a create endpoint that returns an id and an id-parameterized
 item path (from OpenAPI or the manifest); no crawling. Default auth flow is
 token-in-JSON-body. Side-effect detection compares owner-readable collection
 presence and child counts; a mutation with no owner-readable effect is caught

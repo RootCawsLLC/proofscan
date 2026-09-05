@@ -21,7 +21,7 @@ remediation package to `<target>/.proofscan/remediation/` (or `--out <dir>`):
   explicit **merge gate**: do not merge until `proofscan reverify` reports the
   finding `fixed-verified`.
 
-The recommendation is specific to the defect class. For authorisation-ordering /
+The recommendation is specific to the defect class. For authorization-ordering /
 BOLA it is: load the target resource scoped to the caller as the first step,
 short-circuit before any mutation if the caller isn't the owner, and apply that
 scoping to every statement including cascade deletes of child records — with the

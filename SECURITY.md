@@ -21,9 +21,9 @@ honest limits): run Layer 2 only against source you would run locally anyway.
 
 **Layer 3** (`--layers dynamic-fuzzer`) sends live traffic to a running,
 operator-supplied application, registers throwaway accounts, and attempts
-cross-user access — the same activity as an authorised penetration test. **Only
-run it against systems you are authorised to test.** The tool enforces this
-rather than asking politely: it requires both a complete authorisation record for
+cross-user access — the same activity as an authorized penetration test. **Only
+run it against systems you are authorized to test.** The tool enforces this
+rather than asking politely: it requires both a complete authorization record for
 the target in `targets.yaml` (`authorized_by`, `authorized_at`,
 `authorization_basis`, `runtime_base_url`) and `--authorized` on the invocation.
 Neither alone is sufficient, and a run without a record is refused. Layer 3 also
@@ -59,7 +59,7 @@ fetchable by SHA until GitHub Support garbage-collects it.
 
 `test/fixtures/repo/vulnerable/` contains fabricated placeholder secrets and
 insecure patterns. They exist so the rules have positive cases to fire on, they
-authorise nothing anywhere, and each file says so in a header comment. Do not
+authorize nothing anywhere, and each file says so in a header comment. Do not
 copy them into anything real.
 
 ## What proofscan does not claim
