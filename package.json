@@ -37,9 +37,9 @@
   },
   "devDependencies": {
     "@types/node": "^22.10.2",
-    "vitest": "^4.1.10"
+    "vitest": "^4.1.11"
   },
   "optionalDependencies": {
-    "@anthropic-ai/sdk": "^0.116.0"
+    "@anthropic-ai/sdk": "^0.123.0"
   }
 }
